@@ -1,15 +1,15 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const app = express();
-const arr= ['hello','world','test'];
-app.set('view engine','ejs');
-app.use(bodyParser.urlencoded({extended:true}));
-app.get('/',(reg,res) => res.render('index',{arr:arr}));
+const app = require('./app');
+const database = require('./database');
+const config = require('./config');
 
-app.get('/create',(reg,res) => res.render('create'));
-    app.post('/create',(reg,res) => {
-    arr.push(reg.body.text);
-    res.redirect('/');
-});
-
-app.listen(3000,() => console.log('example app'));
+database()
+    .then(info => {
+        console.log(`Connected to ${info.host}:${info.port}/${info.name}`);
+        app.listen(config.PORT, () =>
+            console.log(`Example app listening on port ${config.PORT}!`)
+        );
+    })
+    .catch(() => {
+        console.error('Unable to connect to database');
+        process.exit(1);
+    });
